@@ -1,0 +1,33 @@
+<?php
+$servername = "localhost"; // Reemplaza con tu servidor
+$username = "root"; // Reemplaza con tu usuario
+$password = ""; // Reemplaza con tu contraseña
+$dbname = "delhuertoacasa";
+
+try {
+    $pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+    // Establecer el modo de error de PDO a excepciones
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Error de conexión: " . $e->getMessage());
+}
+ $email = $_POST['email'];
+     $password = $_POST['password'];
+
+     //Preparamos la consulta buscando el usuario por email
+     $sql = "SELECT * FROM usuarios WHERE email = :email";
+     $stmt = $pdo->prepare($sql);
+     //Parametrizamos los datos para seguridad
+     $stmt->bindParam(':email', $email);
+     //Ejecutamos la consulta
+     $stmt->execute();
+     //Guardamos los datos obtenidos
+     $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+     //Di el usuario(email) y password copiciden
+     if ($usuario && password_verify($password, $usuario['password'])) {
+          //Iniciamos variables de sesión
+          $_SESSION['usuario'] = $usuario['nombre'];
+          $_SESSION['ultima_actividad'] = time();
+          //Cargamos index.php
+          header('Location: index.php');
+?>
